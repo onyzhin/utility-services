@@ -1,0 +1,27 @@
+$globalPadding: 10px;
+
+body, html {
+  margin: 0;
+}
+
+.content {
+  padding: 25px 15px 20px 15px;
+}
+
+.md-table {
+  .md-button .md-icon {
+    position: static !important;
+    margin: 0 auto !important;
+
+  }
+  .md-table-head:not(.md-numeric) {
+    text-align: center;
+  }
+  .md-table-cell.md-has-action .md-table-cell-container {
+    justify-content: flex-end !important;
+  }
+}
+
+.md-dialog {
+  min-width: 400px !important;
+}
