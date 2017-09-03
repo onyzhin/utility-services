@@ -26,19 +26,11 @@
 <script>
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import VueLocalStorage from 'vue-localstorage';
-
-  Vue.use(VueLocalStorage);
 
   @Component({
     props: {
       previous: Number,
       context: String,
-    },
-    localStorage: {
-      Rates: {
-        type: Array,
-      },
     },
   })
   export default class Counter extends Vue {
@@ -54,7 +46,7 @@
     }
 
     get calculate() {
-      let rates = this.getRates;
+      let rates = this.rates;
       let result = 0;
       let difference = this.difference;
       for (let j = 0; j < rates.length; j += 1) {
@@ -70,13 +62,19 @@
       return result.toFixed(2);
     }
 
-    get getRates() {
-      let localRates = this.$localStorage.get(this.context);
-      if (typeof localRates === 'string') {
-        if (localRates === 'undefined') return [];
-        return JSON.parse(localRates);
-      }
-      return JSON.parse(JSON.stringify(localRates));
+    get rates() {
+      this.currentValue = 2;
+      return [];
+      /*
+      Зробити щоб таблиця тягнулась тільки один раз на два компоненти
+      */
+      // let userId = this.$root.auth.currentUser.uid;   
+      // this.$root.db.ref(`rates/${userId}/${this.context}`)
+      //   .on('value', (rates) => {
+      //     let newRates = [];
+      //     let ratesValue = rates.val();
+      //     return Object.keys(ratesValue).map(k => ratesValue[k]);
+      //   });
     }
   }
 

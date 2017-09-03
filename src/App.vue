@@ -20,4 +20,22 @@
     text-align: center;
     color: #2c3e50;
   }
+
+  .header-title {
+    text-align: left;
+  }
+
+  .md-display-1 {
+    margin-bottom: 30px;
+  }
+
+  ul {
+    li {
+      display: block;
+    }
+  }
+
+  a {
+    cursor: pointer;
+  }
 </style>

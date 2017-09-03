@@ -1,9 +1,9 @@
-<template>
+<template>  
   <md-whiteframe md-elevation="2">
     <div class="rates-inner">
       <div class="md-title">
         <span>Тарифи</span>
-        <md-button class="md-icon-button md-raised md-warn md-dense" id="custom" @click.native="openDialog('dialog1')">
+        <md-button class="md-icon-button md-raised md-warn md-dense" id="custom" @click.native="openDialog('rateDialog')">
           <md-icon>add</md-icon>
         </md-button>
       </div>
@@ -38,7 +38,7 @@
         </md-table-body>
       </md-table>
 
-      <md-dialog md-open-from="#custom" md-close-to="#custom" ref="dialog1">
+      <md-dialog md-open-from="#custom" md-close-to="#custom" ref="rateDialog">
         <md-dialog-title>Додати тариф</md-dialog-title>
 
         <md-dialog-content>
@@ -53,7 +53,7 @@
             <label>Вартість</label>
             <md-input type="number" min="0" v-model="price"></md-input>
           </md-input-container>
-          <md-button class="md-raised md-primary pull-right" @click.native="saveRate('dialog1')">Додати</md-button>
+          <md-button class="md-raised md-primary pull-right" @click.native="saveRate('rateDialog')">Додати</md-button>
         </md-dialog-content>
       </md-dialog>
     </div>
@@ -63,37 +63,26 @@
 <script>
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import VueLocalStorage from 'vue-localstorage';
-
-  Vue.use(VueLocalStorage);
 
   @Component({
     props: [
       'unit',
       'context',
     ],
-    localStorage: {
-      ElectricityRates: {
-        type: Array,
-      },
-      WaterRates: {
-        type: Array,
-      },
-    },
   })
   export default class Rates extends Vue {
     rate = null;
     price = null;
-    rates = this.getRates;
+    rates = [];
     percentageView = false;
 
-    get getRates() {
-      let localRates = this.$localStorage.get(this.context);
-      if (typeof localRates === 'string') {
-        if (localRates === 'undefined') return [];
-        return JSON.parse(localRates);
-      }
-      return JSON.parse(JSON.stringify(localRates));
+    mounted() {
+      let userId = 'zdCQ9DFruOQSSrV80829kHhCEZ73';
+      this.$root.db.ref(`rates/${userId}/${this.context}`)
+        .on('value', (rates) => {
+          let ratesValue = rates.val();
+          this.rates = (ratesValue) ? Object.keys(ratesValue).map(k => ratesValue[k]) : [];
+        });
     }
 
     previousSum(index) {
@@ -118,9 +107,18 @@
       let rate = Number(this.rate);
       let percentageView = this.percentageView;
       if (price !== null && rate !== null) {
-        this.rates.push({ rate, price, percentageView });
-        this.$localStorage.set(this.context, this.rates);
-        this.closeDialog(ref);
+        this.$root.auth.signInAnonymously()
+          .then((user) => {
+            // let userId = user.uid;
+            let userId = 'zdCQ9DFruOQSSrV80829kHhCEZ73';
+            if (user) {
+              this.$root.db.ref(`rates/${userId}/${this.context}`)
+                .push({ rate, price, percentageView })
+                .then((res) => {
+                  this.closeDialog(ref);
+                });
+            }
+          });
       }
     }
 
